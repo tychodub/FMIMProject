@@ -1,4 +1,7 @@
 module
+import Mathlib.CategoryTheory.Monoidal.CommGrp_
+import Mathlib.CategoryTheory.Monoidal.Grp_
 
-public import Mathlib.CategoryTheory.Monoidal.CommGrp_
-public import Mathlib.CategoryTheory.Monoidal.Grp
+namespace Grp
+
+end Grp
