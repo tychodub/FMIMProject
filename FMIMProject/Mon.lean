@@ -1,5 +1,10 @@
 module
-public import Mathlib
+public import Mathlib.Tactic
+public import Mathlib.Algebra.Category.MonCat.Basic
+public import Mathlib.CategoryTheory.Limits.Shapes.BinaryProducts
+public import Mathlib.Algebra.Group.Prod
+public import Mathlib.CategoryTheory.Monoidal.Cartesian.Basic
+public import Mathlib.CategoryTheory.Monoidal.Mon_
 open CategoryTheory
 open Limits
 
@@ -36,4 +41,6 @@ instance : SymmetricCategory MonCat := SymmetricCategory.mk
 
 
 theorem commutative_monoid_of_monoid_object (M : Mon MonCat) : IsCommMonObj M.X := by
+  apply IsCommMonObj.mk
+  ext XY
   sorry
