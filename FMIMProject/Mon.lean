@@ -1,7 +1,9 @@
 module
-import Mathlib
+public import Mathlib
 open CategoryTheory
 open Limits
+
+@[expose] public section
 
 def binaryProductCone (M N : MonCat) : BinaryFan M N := by
   apply BinaryFan.mk
@@ -33,5 +35,5 @@ instance : BraidedCategory MonCat := BraidedCategory.ofCartesianMonoidalCategory
 instance : SymmetricCategory MonCat := SymmetricCategory.mk
 
 
-
-theorem commutative_monoid_of_monoid_object (M : Mon MonCat) : IsCommMonObj M.X := sorry
+theorem commutative_monoid_of_monoid_object (M : Mon MonCat) : IsCommMonObj M.X := by
+  sorry
