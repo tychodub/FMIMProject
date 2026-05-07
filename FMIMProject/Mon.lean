@@ -29,8 +29,9 @@ instance : CartesianMonoidalCategory MonCat := by
   cat_disch
 
 
-instance : BraidedCategory MonCat := by
-  apply BraidedCategory.ofCartesianMonoidalCategory
+instance : BraidedCategory MonCat := BraidedCategory.ofCartesianMonoidalCategory
+instance : SymmetricCategory MonCat := SymmetricCategory.mk
+
 
 
 theorem commutative_monoid_of_monoid_object (M : Mon MonCat) : IsCommMonObj M.X := sorry
