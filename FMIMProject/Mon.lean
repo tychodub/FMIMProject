@@ -17,8 +17,8 @@ def terminalLimitCone : IsTerminal (MonCat.of PUnit) := by
   · intros M f
     ext
 
-instance : CategoryTheory.CartesianMonoidalCategory MonCat := by
-  apply CategoryTheory.CartesianMonoidalCategory.ofChosenFiniteProducts
+instance : CartesianMonoidalCategory MonCat := by
+  apply CartesianMonoidalCategory.ofChosenFiniteProducts
   · exact ⟨_, terminalLimitCone⟩
   intros M N
   fapply LimitCone.mk
@@ -29,7 +29,8 @@ instance : CategoryTheory.CartesianMonoidalCategory MonCat := by
   cat_disch
 
 
-instance : CategoryTheory.BraidedCategory MonCat := sorry
+instance : BraidedCategory MonCat := by
+  apply BraidedCategory.ofCartesianMonoidalCategory
 
 
-theorem commutative_monoid_of_monoid_object (M : CategoryTheory.Mon MonCat) : CategoryTheory.IsCommMonObj M.X := sorry
+theorem commutative_monoid_of_monoid_object (M : Mon MonCat) : IsCommMonObj M.X := sorry
