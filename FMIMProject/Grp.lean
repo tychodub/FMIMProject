@@ -40,3 +40,9 @@ lemma forget_reflects_commutativity
         rw [this] at isComm2
         apply forget₂_faithful.map_injective at isComm2
         assumption
+
+lemma monIsCommGrpCat (M : GrpCat) [MonObj M] : IsCommMonObj M := by
+      refine forget_reflects_commutativity M ?_
+      let mMon := @Mon.mk MonCat _ _ ((forget₂ GrpCat MonCat).obj M)
+                                 (Functor.monObjObj M)
+      exact commutative_monoid_of_monoid_object mMon
