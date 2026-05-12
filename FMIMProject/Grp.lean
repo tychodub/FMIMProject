@@ -42,7 +42,18 @@ lemma forget_reflects_commutativity
         assumption
 
 lemma monIsCommGrpCat (M : GrpCat) [MonObj M] : IsCommMonObj M := by
-      refine forget_reflects_commutativity M ?_
-      let mMon := @Mon.mk MonCat _ _ ((forget₂ GrpCat MonCat).obj M)
-                                 (Functor.monObjObj M)
-      exact commutative_monoid_of_monoid_object mMon
+
+/--
+every internal group in the category of groups is also commutative.
+-/
+lemma grpIsCommGrpCat (G : GrpCat) [GrpObj G] : IsCommMonObj G := by
+  let mMon : Mon MonCat :=
+    @Mon.mk MonCat _ _
+      ((forget₂ GrpCat MonCat).obj G)
+      (Functor.monObjObj G)
+  have hForget :
+      @IsCommMonObj _ _ _ _
+        ((forget₂ GrpCat MonCat).obj G)
+        (Functor.monObjObj G) :=
+    commutative_monoid_of_monoid_object mMon
+  exact forget_reflects_commutativity G hForget
