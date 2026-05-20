@@ -5,6 +5,8 @@ public import Mathlib.CategoryTheory.Category.Basic
 public import Mathlib.Topology.ContinuousMap.Basic
 public import Mathlib.Topology.Category.TopCat.Basic
 
+@[expose] public section
+
 open CategoryTheory Topology
 
 class PointedTopologicalSpace (X : Type u) (x : X) where
@@ -20,13 +22,14 @@ public instance : CoeSort (PtdTopCat) (Type u) :=
 
 
 public structure Hom (X Y : PtdTopCat) where
-  hom' : C(X, Y)
+  hom' : X.top⟶ Y.top
   presPoint : hom' (X.point) = Y.point
 
+@[simps?]
 public instance : Category PtdTopCat where
   Hom X Y := Hom X Y
-  id X := ⟨ContinuousMap.id X,rfl⟩
+  id X := ⟨𝟙 X.top,rfl⟩
   comp f g := by
-    refine ⟨g.hom'.comp f.hom', ?_⟩
+    refine ⟨f.hom' ≫ g.hom', ?_⟩
     simp
     rw [f.presPoint,g.presPoint]
