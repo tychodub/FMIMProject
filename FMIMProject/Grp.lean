@@ -4,6 +4,7 @@ import Mathlib.CategoryTheory.Monoidal.Grp_
 import Mathlib.CategoryTheory.Monoidal.Mon_
 import Mathlib.Algebra.Category.Grp.Basic
 import Mathlib.Algebra.Category.Grp.CartesianMonoidal
+import Mathlib.CategoryTheory.Monoidal.Internal.Module
 import FMIMProject.Mon
 
 open CategoryTheory
@@ -55,3 +56,13 @@ lemma grpIsCommGrpCat (G : GrpCat) [GrpObj G] : IsCommMonObj G := by
         (Functor.monObjObj G) :=
     commutative_monoid_of_monoid_object mMon
   exact forget_reflects_commutativity G hForget
+
+
+/--
+A monoid object in `Ab`, written elementwise, gives a ring.
+-/
+@[irreducible] noncomputable def monoidObjectInAb_isRing
+    (A : ModuleCat ℤ)
+    [MonObj A] :
+    Ring A := by
+  exact ModuleCat.MonModuleEquivalenceAlgebra.MonObj.toRing A
