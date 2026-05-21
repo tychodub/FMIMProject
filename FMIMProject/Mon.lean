@@ -74,6 +74,8 @@ theorem commutative_monoid_of_monoid_object (M : Mon MonCat) : IsCommMonObj M.X 
   intro Y
   let : CommMonoid (Y ⟶ M.X) := by
     apply EckmannHilton.commMonoid
-
+    sorry
+    sorry
+    sorry
     sorry
   exact this.to_isCommutative
