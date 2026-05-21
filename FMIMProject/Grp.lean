@@ -3,10 +3,7 @@ import Mathlib.CategoryTheory.Monoidal.CommGrp_
 import Mathlib.CategoryTheory.Monoidal.Grp_
 import Mathlib.CategoryTheory.Monoidal.Mon_
 import Mathlib.Algebra.Category.Grp.Basic
-import Mathlib.CategoryTheory.Monoidal.ofHasFiniteProducts
 import Mathlib.Algebra.Category.Grp.CartesianMonoidal
-import Mathlib.Algebra.Category.Grp.Adjunctions
-import Mathlib.Algebra.Category.Grp.Limits
 import FMIMProject.Mon
 
 open CategoryTheory
@@ -46,11 +43,6 @@ lemma monIsCommGrpCat (M : GrpCat) [MonObj M] : IsCommMonObj M := by
       let mMon := @Mon.mk MonCat _ _ ((forget₂ GrpCat MonCat).obj M)
                                  (Functor.monObjObj M)
       exact commutative_monoid_of_monoid_object mMon
-
-
-
-
-
 
 lemma grpIsCommGrpCat (G : GrpCat) [GrpObj G] : IsCommMonObj G := by
   let mMon : Mon MonCat :=
