@@ -42,55 +42,7 @@ lemma forget_reflects_commutativity
         assumption
 
 lemma monIsCommGrpCat (M : GrpCat) [MonObj M] : IsCommMonObj M := by
-
-/--
-every internal group in the category of groups is also commutative.
--/
-structure SimpleInternalGroupInGrp where
-  Carrier : Type
-  instGroup : Group Carrier
-
-  star : Carrier → Carrier → Carrier
-  e : Carrier
-
-  star_left_id : ∀ x : Carrier, star e x = x
-  star_right_id : ∀ x : Carrier, star x e = x
-
-  interchange :
-    ∀ a b c d : Carrier,
-      star (a * c) (b * d) = star a b * star c d
-
-attribute [instance] SimpleInternalGroupInGrp.instGroup
-
-theorem simpleInternalGroupInGrp_ambient_mul_comm
-    (G : SimpleInternalGroupInGrp) :
-    ∀ x y : G.Carrier, x * y = y * x := by
-  letI : Group G.Carrier := G.instGroup
-  have e_eq_one : G.e = (1 : G.Carrier) := by
-    calc
-      G.e = G.star G.e G.e := by
-        rw [G.star_left_id G.e]
-      _ = G.star (G.e * 1) (1 * G.e) := by
-        simp
-      _ = G.star G.e 1 * G.star 1 G.e := by
-        exact G.interchange G.e 1 1 G.e
-      _ = 1 * 1 := by
-        rw [G.star_left_id 1, G.star_right_id 1]
-      _ = 1 := by
-        simp
-  intro x y
-  calc
-    x * y = G.star x G.e * G.star G.e y := by
-      rw [G.star_right_id x, G.star_left_id y]
-    _ = G.star (x * G.e) (G.e * y) := by
-      rw [← G.interchange x G.e G.e y]
-    _ = G.star x y := by
-      rw [e_eq_one]
-      simp
-    _ = G.star (G.e * x) (y * G.e) := by
-      rw [e_eq_one]
-      simp
-    _ = G.star G.e y * G.star x G.e := by
-      rw [G.interchange G.e y x G.e]
-    _ = y * x := by
-      rw [G.star_left_id y, G.star_right_id x]
+      refine forget_reflects_commutativity M ?_
+      let mMon := @Mon.mk MonCat _ _ ((forget₂ GrpCat MonCat).obj M)
+                                 (Functor.monObjObj M)
+      exact commutative_monoid_of_monoid_object mMon
