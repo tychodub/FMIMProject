@@ -6,10 +6,12 @@ public import Mathlib.Algebra.Group.Prod
 public import Mathlib.CategoryTheory.Monoidal.Cartesian.Basic
 public import Mathlib.CategoryTheory.Monoidal.Mon_
 public import Mathlib.CategoryTheory.Monoidal.Cartesian.Mon_
-import Mathlib.GroupTheory.EckmannHilton
+public import Mathlib.GroupTheory.EckmannHilton
 open CategoryTheory
 open Limits
 open MonObj
+open CartesianMonoidalCategory
+open EckmannHilton
 
 @[expose] public section
 
@@ -42,40 +44,38 @@ instance : CartesianMonoidalCategory MonCat := by
 instance : BraidedCategory MonCat := BraidedCategory.ofCartesianMonoidalCategory
 instance : SymmetricCategory MonCat := SymmetricCategory.mk
 
--- instance (M : Mon MonCat) : MulOneClass M.X where
---   one := M.mon.one 1
---   mul X Y := M.mon.mul ⟨ X , Y ⟩
---   one_mul a := sorry
---   mul_one := sorry
 
--- lemma swap_muls (M : Mon MonCat) (a b c d : M.X) : M.mon.mul (a * b , c * d) = (M.mon.mul (a,c)) * (M.mon.mul (b,d)) := by
---   apply M.mon.one.hom'.map_mul
+lemma ones_coincide (M : Mon MonCat) (Y : MonCat) : (1 : Y ⟶ M.X) = toUnit Y ≫ M.mon.one := by
+  ext x
+  -- rw [show (MonCat.Hom.hom (1 : Y ⟶ M.X)) x = 1 from rfl]
+  rw [show (MonCat.Hom.hom (toUnit Y ≫ η)) x = M.mon.one.hom' ((toUnit Y).hom' x) from rfl]
+  rw [show (toUnit Y).hom' x = 1 from rfl]
+  rw [MonoidHom.map_one M.mon.one.hom']
+  rfl
 
--- instance (M : Mon MonCat) : MulOneClass M.X := b
 
--- lemma ones_coincide (M : Mon MonCat) : M.mon.one 1 = 1 := by
---   apply M.mon.one.hom'.map_one
-
--- instance monobjinstance (M : Mon MonCat) (Y : MonCat) : Mul (Y ⟶ M.X) where
---   mul := by
---     intros f g
---     apply MonCat.instCategory.comp
---     · exact CartesianMonoidalCategory.lift f g
---     · exact M.mon.mul
-
--- instance (M : Mon MonCat) (Y : MonCat) : MulOneClass (Y ⟶ M.X) where
---   one := _
---   mul := _
---   one_mul := _
---   mul_one := _
+instance test (M : Mon MonCat) (Y : MonCat) : @EckmannHilton.IsUnital (Y ⟶ M.X) (fun f g ↦
+(CartesianMonoidalCategory.lift f g) ≫ M.mon.mul) 1 where
+  left_id := by
+    intro f
+    rw [ones_coincide, lift_comp_one_left]
+  right_id := by
+    intro f
+    rw [ones_coincide, lift_comp_one_right]
 
 theorem commutative_monoid_of_monoid_object (M : Mon MonCat) : IsCommMonObj M.X := by
   rw [isCommMonObj_iff_isMulCommutative]
   intro Y
   let : CommMonoid (Y ⟶ M.X) := by
     apply EckmannHilton.commMonoid
-    sorry
-    sorry
-    sorry
+    · exact test M Y
+    intros a b c d
+    rw [show lift a c ≫ μ * lift b d ≫ μ = lift (lift a c ≫ μ) (lift b d ≫ μ) ≫ μ from rfl]
+    rw [← lift_map (lift a c) (lift b d) μ μ]
+    rw [← lift_lift_associator_inv a c (lift b d)]
+    rw??
+
+    -- rw [← Hom.mul_def (a * b) (c * d)]
+
     sorry
   exact this.to_isCommutative
