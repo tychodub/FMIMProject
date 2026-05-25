@@ -52,11 +52,11 @@ def mon_mul {M : Mon MonCat} : M.X → M.X → M.X := by
 lemma ones_coincide {M : Mon MonCat} : 1 = M.mon.one 1 := by
   rw [MonoidHom.map_one]
 
-instance mul_instance {M : MonCat} : @IsUnital M (fun a b ↦ a * b) 1 where
+instance mul_is_unital {M : MonCat} : @IsUnital M (fun a b ↦ a * b) 1 where
   left_id := one_mul
   right_id := mul_one
 
-instance mon_instance {M : Mon MonCat} : @IsUnital M.X mon_mul 1 where
+instance mon_is_unital {M : Mon MonCat} : @IsUnital M.X mon_mul 1 where
   left_id := by
     intro x
     unfold mon_mul
@@ -90,7 +90,9 @@ mon_mul (a * c) (b * d) := by
 
 
 theorem commutative_monoid_of_monoid_object (M : Mon MonCat) : IsCommMonObj M.X := by
-  have := @EckmannHilton.mul_comm M.X _ mon_mul 1 1 mul_instance mon_instance muls_coincide
+  have : @Std.Commutative M.X mon_mul := by
+    apply EckmannHilton.mul_comm mul_is_unital mon_is_unital
+    apply muls_coincide
   apply IsCommMonObj.mk
   ext xy
   apply this.comm
