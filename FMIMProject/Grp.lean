@@ -43,7 +43,7 @@ lemma monIsCommGrpCat (M : GrpCat) [MonObj M] : IsCommMonObj M := by
       refine forget_reflects_commutativity M ?_
       let mMon := @Mon.mk MonCat _ _ ((forget₂ GrpCat MonCat).obj M)
                                  (Functor.monObjObj M)
-      exact commutative_monoid_of_monoid_object mMon
+      exact IsCommMonObj_of_monoid_object mMon
 
 lemma grpIsCommGrpCat (G : GrpCat) [GrpObj G] : IsCommMonObj G := by
   let mMon : Mon MonCat :=
@@ -54,7 +54,7 @@ lemma grpIsCommGrpCat (G : GrpCat) [GrpObj G] : IsCommMonObj G := by
       @IsCommMonObj _ _ _ _
         ((forget₂ GrpCat MonCat).obj G)
         (Functor.monObjObj G) :=
-    commutative_monoid_of_monoid_object mMon
+    IsCommMonObj_of_monoid_object mMon
   exact forget_reflects_commutativity G hForget
 
 
