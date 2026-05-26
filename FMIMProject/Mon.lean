@@ -5,8 +5,14 @@ public import Mathlib.CategoryTheory.Limits.Shapes.BinaryProducts
 public import Mathlib.Algebra.Group.Prod
 public import Mathlib.CategoryTheory.Monoidal.Cartesian.Basic
 public import Mathlib.CategoryTheory.Monoidal.Mon_
+public import Mathlib.CategoryTheory.Monoidal.Cartesian.Mon_
+public import Mathlib.GroupTheory.EckmannHilton
 open CategoryTheory
 open Limits
+open MonObj
+open MonoidalCategory
+open CartesianMonoidalCategory
+open EckmannHilton
 
 @[expose] public section
 
@@ -39,8 +45,52 @@ instance : CartesianMonoidalCategory MonCat := by
 instance : BraidedCategory MonCat := BraidedCategory.ofCartesianMonoidalCategory
 instance : SymmetricCategory MonCat := SymmetricCategory.mk
 
+-- we need to define a second monoid structure on M.X given by the monoid multiplication in MonCat
+def mon_mul {M : Mon MonCat} : M.X → M.X → M.X := by
+  intros x y
+  exact μ[M.X].hom (x, y)
 
-theorem commutative_monoid_of_monoid_object (M : Mon MonCat) : IsCommMonObj M.X := by
+-- This repackages the fact that M has a unit in a way we need
+instance mul_is_unital {M : MonCat} : @IsUnital M (fun a b ↦ a * b) 1 where
+  left_id := one_mul
+  right_id := mul_one
+
+-- This shows that our second multiplication has a unit
+instance mon_is_unital {M : Mon MonCat} : @IsUnital M.X mon_mul (η[M.X] 1) where
+  left_id := by
+    intro x
+    unfold mon_mul
+    calc
+      μ[M.X].hom ((η[M.X].hom) 1, x) = ((η[M.X] ⊗ₘ 𝟙 M.X) ≫ μ).hom (1, x) := by
+        exact MonoidHom.mem_eqLocusM.mp rfl
+      _ = (𝟙 M.X : M.X ⟶ M.X).hom' x := by
+        rw [one_mul_hom]
+        rfl
+      _ = x := by
+        apply MonCat.id_apply
+  right_id := by
+    intro x
+    unfold mon_mul
+    calc
+      μ[M.X].hom (x, (η[M.X].hom) 1) = ((𝟙 M.X ⊗ₘ η) ≫ μ).hom (x, 1) := by
+        exact MonoidHom.mem_eqLocusM.mp rfl
+      _ = (𝟙 M.X : M.X ⟶ M.X).hom' x := by
+        rw [mul_one_hom]
+        rfl
+      _ = x := by
+        apply MonCat.id_apply
+
+lemma muls_coincide {M : Mon MonCat} (a b c d : M.X) :  (mon_mul a b) * (mon_mul c d) =
+mon_mul (a * c) (b * d) := by
+  unfold mon_mul
+  rw [← MonoidHom.map_mul (MonCat.Hom.hom μ[M.X]) (a, b) (c, d)]
+  rfl
+
+
+theorem IsCommMonObj_of_monoid_object (M : Mon MonCat) : IsCommMonObj M.X := by
+  have : @Std.Commutative M.X mon_mul := by -- We want the mon_mul to be unital so we use mul_comm
+    apply EckmannHilton.mul_comm mul_is_unital mon_is_unital
+    apply muls_coincide
   apply IsCommMonObj.mk
-  ext XY
-  sorry
+  ext
+  apply this.comm
