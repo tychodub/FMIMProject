@@ -87,10 +87,14 @@ mon_mul (a * c) (b * d) := by
   rfl
 
 
-theorem IsCommMonObj_of_monoid_object (M : Mon MonCat) : IsCommMonObj M.X := by
-  have : @Std.Commutative M.X mon_mul := by -- We want the mon_mul to be unital so we use mul_comm
-    apply EckmannHilton.mul_comm mul_is_unital mon_is_unital
-    apply muls_coincide
-  apply IsCommMonObj.mk
-  ext
-  apply this.comm
+
+theorem IsCommMonObj_of_monoid_object (M : Mon MonCat) :
+    @Std.Commutative M.X (fun a b => a * b) :=
+  @EckmannHilton.mul_comm M.X
+    (fun a b : M.X => mon_mul (M := M) a b)
+    (fun a b : M.X => a * b)
+    (η[M.X] 1)
+    1
+    (mon_is_unital (M := M))
+    (mul_is_unital (M := M.X))
+    (fun a b c d => (muls_coincide (M := M) a c b d).symm)
