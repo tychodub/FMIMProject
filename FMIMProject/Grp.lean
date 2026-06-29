@@ -1,11 +1,14 @@
 module
-import Mathlib.CategoryTheory.Monoidal.CommGrp_
-import Mathlib.CategoryTheory.Monoidal.Grp_
-import Mathlib.CategoryTheory.Monoidal.Mon_
-import Mathlib.Algebra.Category.Grp.Basic
-import Mathlib.Algebra.Category.Grp.CartesianMonoidal
-import Mathlib.CategoryTheory.Monoidal.Internal.Module
-import FMIMProject.Mon
+
+public import Mathlib.CategoryTheory.Monoidal.CommGrp_
+public import Mathlib.CategoryTheory.Monoidal.Grp_
+public import Mathlib.CategoryTheory.Monoidal.Mon_
+public import Mathlib.Algebra.Category.Grp.Basic
+public import Mathlib.Algebra.Category.Grp.CartesianMonoidal
+public import Mathlib.CategoryTheory.Monoidal.Internal.Module
+public import FMIMProject.Mon
+
+@[expose] public section
 
 open CategoryTheory
 
@@ -39,23 +42,25 @@ lemma forget_reflects_commutativity
         apply forget₂_faithful.map_injective at isComm2
         assumption
 
-lemma monIsCommGrpCat (M : GrpCat) [MonObj M] : IsCommMonObj M := by
-      refine forget_reflects_commutativity M ?_
-      let mMon := @Mon.mk MonCat _ _ ((forget₂ GrpCat MonCat).obj M)
-                                 (Functor.monObjObj M)
-      exact IsCommMonObj_of_monoid_object mMon
+lemma monIsCommGrpCat (M : GrpCat) [MonObj M] :
+    @Std.Commutative ((forget₂ GrpCat MonCat).obj M)
+      (fun a b => a * b) := by
+  let mMon : Mon MonCat :=
+    @Mon.mk MonCat _ _
+      ((forget₂ GrpCat MonCat).obj M)
+      (Functor.monObjObj M)
+  simpa [mMon] using IsCommMonObj_of_monoid_object mMon
 
-lemma grpIsCommGrpCat (G : GrpCat) [GrpObj G] : IsCommMonObj G := by
+
+lemma grpIsCommGrpCat (G : GrpCat) [GrpObj G] :
+    @Std.Commutative ((forget₂ GrpCat MonCat).obj G)
+      (fun a b => a * b) := by
   let mMon : Mon MonCat :=
     @Mon.mk MonCat _ _
       ((forget₂ GrpCat MonCat).obj G)
       (Functor.monObjObj G)
-  have hForget :
-      @IsCommMonObj _ _ _ _
-        ((forget₂ GrpCat MonCat).obj G)
-        (Functor.monObjObj G) :=
-    IsCommMonObj_of_monoid_object mMon
-  exact forget_reflects_commutativity G hForget
+  simpa [mMon] using IsCommMonObj_of_monoid_object mMon
+
 
 
 /--
