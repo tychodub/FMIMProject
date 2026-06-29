@@ -30,7 +30,7 @@ public structure Hom (X Y : PtdTopCat) where
   hom' : X.top⟶ Y.top
   presPoint : hom' (X.point) = Y.point
 
-@[simps?]
+@[simps]
 public instance : Category PtdTopCat where
   Hom X Y := Hom X Y
   id X := ⟨𝟙 X.top,rfl⟩
@@ -53,42 +53,33 @@ def piFan {ι : Type v} (α : ι → PtdTopCat.{max v u}) : CategoryTheory.Limit
 -- piFanIsLimit is the same as TopCat.piFanIsLimt, but then for PtdTopCat.
 def piFanIsLimit {ι : Type v} (α : ι → PtdTopCat.{max v u}) :
   CategoryTheory.Limits.IsLimit (piFan α) where
-  lift S := Hom.of (TopCat.ofHom
-    {toFun:= fun s i => (S.π.app ⟨i⟩).hom' s
-     continuous_toFun := continuous_pi (fun i => (S.π.app ⟨i⟩).hom'.hom.2)})
-     (by
-        simp only [Functor.const_obj_obj, Discrete.functor_obj_eq_as, ConcreteCategory.hom_ofHom]
-        change ((fun s i ↦ (ConcreteCategory.hom (S.π.app { as := i }).hom') s) S.pt.point
-          =(piFan α).pt.point )
-        simp only [Discrete.functor_obj_eq_as, Functor.const_obj_obj]
-        ext i
-        have := (S.π.app { as := i }).presPoint;
-        simp only [Discrete.functor_obj_eq_as, Functor.const_obj_obj] at this;
-        exact this
-      )
-  uniq := by
-    intro S m h
-    cases m with
-    | of mh mp =>
-    have : mh = TopCat.ofHom
-      { toFun := fun s i ↦ (ConcreteCategory.hom (S.π.app { as := i }).hom') s,
-        continuous_toFun := continuous_pi fun i ↦
-          (TopCat.Hom.hom (S.π.app { as := i }).hom').continuous_toFun } := by
+    lift S := by
+      refine
+        { hom' := TopCat.ofHom
+            { toFun := fun s i => (S.π.app ⟨i⟩).hom' s
+              continuous_toFun := continuous_pi fun i =>
+                (TopCat.Hom.hom (S.π.app ⟨i⟩).hom').continuous_toFun }
+          presPoint := ?_ }
+      change
+        (fun i => (S.π.app ⟨i⟩).hom' S.pt.point)
+          =
+        (fun i => (α i).point)
+      funext i
+      simpa using (S.π.app ⟨i⟩).presPoint
+
+    fac S j := by
+      apply Hom.ext
+      ext x
+      cases j
+      rfl
+
+    uniq := by
+      intro S m h
+      apply Hom.ext
       ext x
       funext i
-      have h' : ∀ (j : Discrete ι), mh ≫ ((piFan α).π.app j).hom' = (S.π.app j).hom' := by
-        intro j
-        calc
-          mh ≫ ((piFan α).π.app j).hom' =
-            ({ hom' := mh, presPoint := mp }: S.pt ⟶ (piFan α).pt).hom' ≫ ((piFan α).π.app j).hom'
-            := by rfl
-          _ = (({ hom' := mh, presPoint := mp }: S.pt ⟶ (piFan α).pt) ≫ ((piFan α).π.app j)).hom'
-            := by rfl
-          _ = (S.π.app j).hom' := by rw [h j]
-      simp only [Discrete.functor_obj_eq_as, Functor.const_obj_obj, ConcreteCategory.hom_ofHom]
-      change (((ConcreteCategory.hom mh) x i) =
-        (fun s i ↦ (ConcreteCategory.hom (S.π.app { as := i }).hom') s) x i)
-      simp [← h' ⟨i⟩]
-      rfl
-    subst this
-    simp
+      have h' :
+          m.hom' ≫ ((piFan α).π.app ⟨i⟩).hom' = (S.π.app ⟨i⟩).hom' := by
+        simpa using congrArg Hom.hom' (h ⟨i⟩)
+      simpa [piFan, piπ, TopCat.hom_comp, ContinuousMap.comp_apply] using
+        ConcreteCategory.congr_hom h' x
