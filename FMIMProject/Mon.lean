@@ -98,3 +98,4 @@ theorem IsCommMonObj_of_monoid_object (M : Mon MonCat) :
     (mon_is_unital (M := M))
     (mul_is_unital (M := M.X))
     (fun a b c d => (muls_coincide (M := M) a c b d).symm)
+--mon_mul a b * mon_mul c d=mon_mul (a * c) (b * d); η=1; mon_mul= ∗
